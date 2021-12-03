@@ -1,25 +1,24 @@
 #!/bin/bash
 
 input=($(cat input))
-
-# 1010111000111
-# 1101011010101
+# 1010111000111 1101011010101
 
 # oxygen generator rating array
-oxgenarr=()
+oxgenarr=(${input[@]})
 # co2 scrubber rating array
-co2scarr=()
+co2scarr=(${input[@]})
 
 pos=0 # for loop count position
-while(( ${#oxgenarr[@]}!=1 )); do
+# TODO can write in one place
+while((${#oxgenarr[@]}!=1)); do
 	count=0
 	# it's position bit is one
 	bitone=()
 	# it's position bit is zero
 	bitzero=()
 
-	for (( i=0;i<${#input[@]};i++ )); do
-		tmp=${input[i]}
+	for (( i=0;i<${#oxgenarr[@]};i++ )); do
+		tmp=${oxgenarr[i]}
 		case ${tmp:pos:1} in
 			0)
 				count=`expr ${count} - 1`
@@ -32,16 +31,57 @@ while(( ${#oxgenarr[@]}!=1 )); do
 		esac
 	done
 
-	if [ ${count} -gt 0 ]; then
+	# NOTE should use -ge for 1 and 0 count equal
+	if [ ${count} -ge 0 ]; then
 		oxgenarr=(${bitone[@]})
 	else
 		oxgenarr=(${bitzero[@]})
 	fi
 
-	if [ ${pos} -eq ${#input[1]} ]; then
+	# TODO calc input[0] len - 1
+	if [ ${pos} -eq 11 ]; then
+		pos=0
 		break
 	fi
 
 	pos=`expr ${pos} + 1`
 done
+
+while((${#co2scarr[@]}!=1)); do
+	count=0
+	# it's position bit is one
+	bitone=()
+	# it's position bit is zero
+	bitzero=()
+
+	for (( i=0;i<${#co2scarr[@]};i++ )); do
+		tmp=${co2scarr[i]}
+		case ${tmp:pos:1} in
+			0)
+				count=`expr ${count} - 1`
+				bitzero+=(${tmp})
+				;;
+			1)
+				count=`expr ${count} + 1`
+				bitone+=(${tmp})
+				;;
+		esac
+	done
+
+	# NOTE should use -gt for 1 and 0 count equal
+	if [ ${count} -ge 0 ]; then
+		co2scarr=(${bitzero[@]})
+	else
+		co2scarr=(${bitone[@]})
+	fi
+
+	if [ ${pos} -eq 11 ]; then
+		pos=0
+		break
+	fi
+
+	pos=`expr ${pos} + 1`
+done
+
+echo $(( $((2#${oxgenarr})) * $((2#${co2scarr})) ))
 
