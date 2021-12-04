@@ -1,0 +1,19 @@
+#!/bin/bash
+
+input=($(cat input))
+grid_size=`expr 5 \* 5`
+
+marked_arr=()
+# fill marked number to array marked_arr
+IFS=',' read -ra marked_arr <<< "${input[0]}"
+
+# offset start by 1 (ignore marked numbers)
+offset=1
+for (( j=1;j<=`expr $((${#input[@]}-1)) / ${grid_size}`;j++ )); do
+	echo ${offset}
+	current_grid=(${input[@]:${offset}:${grid_size}})
+	echo ${current_grid[@]}
+
+	offset=`expr ${j} \* ${grid_size} + 1`
+done
+
